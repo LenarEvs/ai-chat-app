@@ -3,6 +3,7 @@ import type { UserProfile } from '@/entities/user'
 import type { Chat } from '@/entities/chat'
 import { useMessengerStore } from '@/entities/chat'
 import { Avatar } from '@/shared/ui/Avatar'
+import { Search } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { formatChatListTime } from '@/shared/lib/format-time'
 
@@ -88,10 +89,8 @@ export function ChatSidebar({ className }: { className?: string }) {
       <div className="border-b border-black/35 px-4 pb-2 pt-[14px]">
         <div className="mx-auto mb-3 flex items-center gap-2">
           <div className="relative flex min-w-0 flex-1">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M10 18a8 8 0 118-8 8 8 0 01-8 8zm11 2l-4-4 1.4-1.4 4 4L21 20zM10 5a7 7 0 107 7 7 7 0 00-7-7z" />
-              </svg>
+            <span className="pointer-events-none absolute left-3 top-1/2 flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center text-slate-400">
+              <Search size={18} strokeWidth={1.75} className="shrink-0" />
             </span>
             <input
               type="search"

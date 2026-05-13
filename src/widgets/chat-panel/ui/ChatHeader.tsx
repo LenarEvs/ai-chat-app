@@ -1,5 +1,6 @@
 import { useMessengerStore } from '@/entities/chat'
 import { Avatar } from '@/shared/ui/Avatar'
+import { ChevronLeft, Ellipsis, Search } from 'lucide-react'
 
 interface ChatHeaderProps {
   chatId: string
@@ -38,9 +39,12 @@ export function ChatHeader({ chatId, onBack, showBack }: ChatHeaderProps) {
           className="flex h-10 w-10 items-center justify-center rounded-full text-slate-200 hover:bg-white/5 md:hidden"
           aria-label="Назад к списку"
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z" />
-          </svg>
+          <ChevronLeft
+            size={22}
+            strokeWidth={1.75}
+            className="shrink-0"
+            aria-hidden
+          />
         </button>
       ) : null}
 
@@ -61,9 +65,7 @@ export function ChatHeader({ chatId, onBack, showBack }: ChatHeaderProps) {
         className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-300 hover:bg-white/5 md:inline-flex"
         title="Поиск по чату (мок)"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M10 18a8 8 0 118-8 8 8 0 01-8 8zm11 2l-4-4 1.4-1.4 4 4L21 20zM10 5a7 7 0 107 7 7 7 0 00-7-7z" />
-        </svg>
+        <Search size={20} strokeWidth={1.75} className="shrink-0" aria-hidden />
       </button>
 
       <button
@@ -71,11 +73,7 @@ export function ChatHeader({ chatId, onBack, showBack }: ChatHeaderProps) {
         className="flex h-10 w-10 items-center justify-center rounded-full text-slate-300 hover:bg-white/5"
         title="Меню (мок)"
       >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="5" cy="12" r="2" />
-          <circle cx="12" cy="12" r="2" />
-          <circle cx="19" cy="12" r="2" />
-        </svg>
+        <Ellipsis size={22} strokeWidth={1.75} className="shrink-0" aria-hidden />
       </button>
     </header>
   )

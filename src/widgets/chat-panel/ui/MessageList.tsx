@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { Check, CheckCheck } from 'lucide-react'
 import type { Message } from '@/entities/message'
 import { CURRENT_USER_ID } from '@/entities/user'
 import { cn } from '@/shared/lib/cn'
@@ -9,93 +10,84 @@ interface MessageBubbleProps {
   senderName?: string
 }
 
-/** Пузырьки сообщений в цветах, близких к Telegram */
-function BubbleTailMine() {
+function DeliveryTicks({ delivery }: { delivery: Message['delivery'] }) {
+  const baseClass = '-mt-px shrink-0'
+
+  if (delivery === 'sent') {
+    return (
+      <Check
+        size={15}
+        strokeWidth={2.25}
+        className={cn(baseClass, 'text-white/45')}
+        aria-hidden
+      />
+    )
+  }
+
+  if (delivery === 'delivered') {
+    return (
+      <CheckCheck
+        size={15}
+        strokeWidth={2.25}
+        className={cn(baseClass, 'text-white/45')}
+        aria-hidden
+      />
+    )
+  }
+
   return (
-    <span
-      className="pointer-events-none absolute bottom-[-1px] right-[-8px] h-[10px] w-[10px] text-[#2b5278]"
+    <CheckCheck
+      size={15}
+      strokeWidth={2.25}
+      className={cn(baseClass, 'text-sky-300')}
       aria-hidden
-    >
-      <svg viewBox="0 0 8 13" width="10" height="14" fill="currentColor">
-        <path d="M1.533 11.957a1 1 0 01-.64-.229.998.998 0 01-.367-.855V1.272A3.99 3.99 0 014.557 7.96h4.076a1 1 0 01.707 1.707l-7.708 7.291z" />
-      </svg>
-    </span>
+    />
   )
 }
 
-function BubbleTailTheir() {
-  return (
-    <span
-      className="pointer-events-none absolute bottom-[-1px] left-[-8px] h-[10px] w-[10px] text-[#182533]"
-      aria-hidden
-    >
-      <svg viewBox="0 0 8 13" width="10" height="14" fill="currentColor">
-        <path d="M6.466 11.957a1 1 0 00.641-.229.998.998 0 00.367-.855V1.272A3.99 3.99 0 003.442 7.96H-.634a1 1 0 00-.707 1.707l7.707 7.291z" />
-      </svg>
-    </span>
-  )
-}
-
-function DeliveryTicks({
+function DeliveryMeta({
   mine,
   delivery,
+  timeLabel,
 }: {
   mine: boolean
   delivery: Message['delivery']
+  timeLabel: string
 }) {
-  if (!mine) return null
-  const read = delivery === 'read'
-
   return (
-    <span
-      className={cn(
-        'ml-2 inline-flex shrink-0 items-center gap-[-3px] text-[14px]',
-        read ? 'text-sky-300' : 'text-slate-400/95',
-      )}
-      aria-label={delivery}
-      title={
-        delivery === 'sent'
-          ? 'Отправлено'
-          : delivery === 'delivered'
-            ? 'Доставлено'
-            : 'Прочитано'
-      }
-    >
-      <span className="translate-x-[1px]">✓</span>
-      <span className="-ml-[10px]">✓</span>
-    </span>
+    <div className="mt-2 flex shrink-0 items-center justify-end gap-1 whitespace-nowrap text-[11px] tabular-nums text-white/[0.62]">
+      <span>{timeLabel}</span>
+      {mine ? <DeliveryTicks delivery={delivery} /> : null}
+    </div>
   )
 }
 
 export function MessageBubble({ message, senderName }: MessageBubbleProps) {
   const mine = message.authorId === CURRENT_USER_ID
+  const bg = mine ? 'bg-[#2b5278]' : 'bg-[#182533]'
+  const timeLabel = formatMessageTime(message.createdAt)
 
   return (
     <div
-      className={cn('flex px-5 py-[2px]', mine ? 'justify-end' : 'justify-start')}
+      className={cn('flex px-4 py-0.5', mine ? 'justify-end' : 'justify-start')}
     >
       <div
         className={cn(
-          'relative inline-flex max-w-[min(720px,calc(100%-16px))] flex-col rounded-2xl px-3 pb-2 pt-[7px]',
-          mine
-            ? 'rounded-br-none bg-[#2b5278]'
-            : 'rounded-bl-none bg-[#182533]',
+          'relative max-w-[min(760px,calc(100%-4px))] rounded-2xl px-3 py-2 ring-1 ring-black/35',
+          bg,
+          mine ? 'rounded-br-md' : 'rounded-bl-md',
         )}
       >
         {!mine && senderName ? (
-          <span className="mb-1 text-[13px] font-semibold text-sky-300/95">
+          <div className="mb-2 text-[13px] font-semibold leading-tight text-sky-300/95">
             {senderName}
-          </span>
+          </div>
         ) : null}
-        <div className="flex items-end gap-1 whitespace-pre-wrap break-words text-[15px] leading-snug text-slate-100">
-          <p className="min-w-[40px] pr-12">{message.text}</p>
-        </div>
-        <span className={cn('-mt-[18px] flex items-center justify-end text-[11px] text-white/58')}>
-          <span>{formatMessageTime(message.createdAt)}</span>
-          <DeliveryTicks mine={mine} delivery={message.delivery} />
-        </span>
 
-        {mine ? <BubbleTailMine /> : <BubbleTailTheir />}
+        <div className="text-[15px] leading-snug text-slate-100 [overflow-wrap:anywhere]">
+          <p className="m-0 whitespace-pre-wrap">{message.text}</p>
+          <DeliveryMeta mine={mine} delivery={message.delivery} timeLabel={timeLabel} />
+        </div>
       </div>
     </div>
   )

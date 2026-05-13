@@ -1,3 +1,4 @@
+import { AppLogo } from '@/shared/ui/AppLogo'
 import { cn } from '@/shared/lib/cn'
 
 interface ChatEmptyProps {
@@ -14,8 +15,8 @@ export function ChatEmpty({ className }: ChatEmptyProps) {
       )}
     >
       <div className="max-w-[360px] px-6 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[22px] bg-sky-500/90 text-[28px] font-black text-[#17212b] shadow-lg ring-2 ring-black/35">
-          O
+        <div className="mx-auto mb-5 flex justify-center">
+          <AppLogo variant="hero" />
         </div>
         <h2 className="text-lg font-semibold text-slate-100">
           Otus Messenger · мок

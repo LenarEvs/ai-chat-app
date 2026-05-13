@@ -5,6 +5,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+import { Loader2, Paperclip, Send } from 'lucide-react'
 import { useMessengerStore } from '@/entities/chat'
 import { cn } from '@/shared/lib/cn'
 
@@ -40,58 +41,73 @@ export function SendMessageForm() {
   if (!activeChatId) return null
 
   return (
-    <footer className="border-t border-black/35 bg-[#17212b] px-3 pb-[max(env(safe-area-inset-bottom,0px),10px)] pt-2 md:pb-3 md:pt-3">
+    <footer className="border-t border-black/35 bg-[#17212b] pb-[max(env(safe-area-inset-bottom),10px)] pt-3 md:pb-4 md:pt-4">
       <form
-        className="mx-auto flex w-full max-w-[920px] items-end gap-2"
+        className="flex w-full max-w-none px-3 sm:px-4 md:px-6"
         onSubmit={(e: FormEvent) => {
           e.preventDefault()
           void submit()
         }}
       >
-        <button
-          type="button"
+        <div
           className={cn(
-            'mb-[3px] flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full text-slate-300 hover:bg-white/6',
+            'flex w-full min-h-[52px] items-end gap-0 rounded-[26px]',
+            'border border-white/[0.08] bg-[#24303f]/98',
+            'shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]',
+            'pl-2 pr-1.5 py-1.5 md:min-h-[56px]',
           )}
-          title="Вложения (мок)"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16.5 6v11a4.5 4.5 0 01-9 0V9a3 3 0 016 0v8a1.5 1.5 0 01-3 0V11h2v6c0 .8.8 1.5 2 1.5s2-.7 2-1.5V9c0-2.2-1.8-4-4-4S7 6.8 7 9v11a6 6 0 0012 0V6h-2.5z" />
-          </svg>
-        </button>
+          <button
+            type="button"
+            className={cn(
+              'mb-[2px] flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full text-slate-300',
+              'hover:bg-white/[0.08] active:bg-white/[0.12]',
+            )}
+            title="Вложения (мок)"
+          >
+            <Paperclip size={21} strokeWidth={1.75} className="shrink-0" />
+          </button>
 
-        <div className="relative min-w-0 flex-1">
           <textarea
             value={value}
             disabled={sending}
             rows={1}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Сообщение…"
-            className="max-h-40 min-h-[46px] w-full resize-none rounded-[22px] border border-transparent bg-black/35 px-[18px] py-[12px] text-[15px] leading-snug text-slate-100 outline-none placeholder:text-slate-500 focus:border-sky-500/45 disabled:opacity-60"
+            placeholder="Напишите сообщение..."
+            className={cn(
+              'max-h-[12.5rem] min-h-[44px] w-full resize-none px-3 py-[11px] text-[15px] leading-relaxed text-slate-100',
+              'rounded-[999px] bg-transparent outline-none md:min-h-[46px]',
+              'placeholder:text-slate-500',
+              'focus-visible:outline-none disabled:opacity-55',
+            )}
           />
-        </div>
 
-        <button
-          type="submit"
-          disabled={!canSend}
-          className={cn(
-            'mb-[3px] flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full font-semibold text-[#17212b] shadow-sm',
-            canSend
-              ? 'bg-sky-400 hover:bg-sky-300'
-              : 'cursor-not-allowed bg-slate-700/60 text-slate-300/40',
-          )}
-          title="Отправить"
-          aria-label="Отправить сообщение"
-        >
-          {sending ? (
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#17212b]/30 border-t-[#17212b]" />
-          ) : (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-            </svg>
-          )}
-        </button>
+          <button
+            type="submit"
+            disabled={!canSend}
+            className={cn(
+              'mb-[2px] flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full font-semibold',
+              'transition-[transform,box-shadow,color] duration-150',
+              canSend
+                ? 'bg-gradient-to-br from-sky-300 to-sky-500 text-[#0f1b26] shadow-md shadow-black/25 hover:-translate-y-px hover:from-sky-200 hover:to-sky-400'
+                : 'cursor-not-allowed bg-slate-800/90 text-slate-500 shadow-none',
+            )}
+            title="Отправить"
+            aria-label="Отправить сообщение"
+          >
+            {sending ? (
+              <Loader2
+                size={21}
+                strokeWidth={2}
+                className="shrink-0 animate-spin text-[#0f1b26]"
+                aria-hidden
+              />
+            ) : (
+              <Send size={20} strokeWidth={1.85} className="shrink-0" aria-hidden />
+            )}
+          </button>
+        </div>
       </form>
     </footer>
   )

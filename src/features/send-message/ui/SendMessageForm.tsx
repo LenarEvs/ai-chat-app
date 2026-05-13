@@ -3,6 +3,7 @@ import {
   type KeyboardEvent,
   useCallback,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import { Loader2, Paperclip, Send } from 'lucide-react'
@@ -13,11 +14,13 @@ import { cn } from '@/shared/lib/cn'
 export function SendMessageForm() {
   const activeChatId = useMessengerStore((s) => s.activeChatId)
   const sendText = useMessengerStore((s) => s.sendText)
+  const sendByEnter = useMessengerStore((s) => s.sendByEnter)
   const sending = useMessengerStore((s) =>
     activeChatId ? Boolean(s.sendInFlight[activeChatId]) : false,
   )
 
   const [value, setValue] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const canSend = useMemo(
     () => Boolean(activeChatId) && Boolean(value.trim()) && !sending,
@@ -32,10 +35,10 @@ export function SendMessageForm() {
   }, [canSend, sendText, value])
 
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      void submit()
-    }
+    if (e.key !== 'Enter' || e.shiftKey) return
+    if (!sendByEnter) return
+    e.preventDefault()
+    void submit()
   }
 
   if (!activeChatId) return null
@@ -49,6 +52,15 @@ export function SendMessageForm() {
           void submit()
         }}
       >
+        <input
+          ref={fileInputRef}
+          type="file"
+          className="hidden"
+          multiple
+          onChange={() => {
+            if (fileInputRef.current) fileInputRef.current.value = ''
+          }}
+        />
         <div
           className={cn(
             'flex w-full min-h-[52px] items-end gap-0 rounded-[26px]',
@@ -59,11 +71,12 @@ export function SendMessageForm() {
         >
           <button
             type="button"
+            onClick={() => fileInputRef.current?.click()}
             className={cn(
               'mb-[2px] flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full text-slate-300',
               'hover:bg-white/[0.08] active:bg-white/[0.12]',
             )}
-            title="Вложения (мок)"
+            title="Выбрать файлы (локально)"
           >
             <Paperclip size={21} strokeWidth={1.75} className="shrink-0" />
           </button>

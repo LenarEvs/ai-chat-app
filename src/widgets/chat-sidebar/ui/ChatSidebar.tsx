@@ -3,9 +3,10 @@ import type { UserProfile } from '@/entities/user'
 import type { Chat } from '@/entities/chat'
 import { useMessengerStore } from '@/entities/chat'
 import { Avatar } from '@/shared/ui/Avatar'
-import { Search } from 'lucide-react'
+import { Search, Settings, User } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { formatChatListTime } from '@/shared/lib/format-time'
+import { useIsNarrowScreen } from '@/shared/lib/use-media-query'
 
 function ChatRow({
   chat,
@@ -68,6 +69,8 @@ export function ChatSidebar({ className }: { className?: string }) {
   const selectChat = useMessengerStore((s) => s.selectChat)
   const sidebarSearch = useMessengerStore((s) => s.sidebarSearch)
   const setSidebarSearch = useMessengerStore((s) => s.setSidebarSearch)
+  const setAppMainView = useMessengerStore((s) => s.setAppMainView)
+  const narrow = useIsNarrowScreen()
 
   const filtered = useMemo(() => {
     const q = sidebarSearch.trim().toLowerCase()
@@ -87,6 +90,26 @@ export function ChatSidebar({ className }: { className?: string }) {
       )}
     >
       <div className="border-b border-black/35 px-4 pb-2 pt-[14px]">
+        {narrow ? (
+          <div className="mx-auto mb-3 flex items-center justify-end gap-2">
+            <button
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-slate-200 hover:bg-white/5"
+              title="Профиль"
+              onClick={() => setAppMainView('profile')}
+            >
+              <User size={20} strokeWidth={1.75} aria-hidden />
+            </button>
+            <button
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-slate-200 hover:bg-white/5"
+              title="Настройки"
+              onClick={() => setAppMainView('settings')}
+            >
+              <Settings size={20} strokeWidth={1.75} aria-hidden />
+            </button>
+          </div>
+        ) : null}
         <div className="mx-auto mb-3 flex items-center gap-2">
           <div className="relative flex min-w-0 flex-1">
             <span className="pointer-events-none absolute left-3 top-1/2 flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center text-slate-400">

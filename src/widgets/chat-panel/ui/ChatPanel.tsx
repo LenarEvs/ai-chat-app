@@ -4,6 +4,7 @@ import { ChatEmpty } from '@/widgets/chat-panel/ui/ChatEmpty'
 import { ChatHeader } from '@/widgets/chat-panel/ui/ChatHeader'
 import { MessageList } from '@/widgets/chat-panel/ui/MessageList'
 import { SendMessageForm } from '@/features/send-message'
+import { ChatSettingsView } from '@/widgets/chat-settings-view/ui/ChatSettingsView'
 
 interface ChatPanelProps {
   className?: string
@@ -13,9 +14,15 @@ interface ChatPanelProps {
 /** Правая колонка: шапка, лента сообщений и поле ввода */
 export function ChatPanel({ className, showBack }: ChatPanelProps) {
   const activeChatId = useMessengerStore((s) => s.activeChatId)
+  const chatSettingsChatId = useMessengerStore((s) => s.chatSettingsChatId)
   const selectChat = useMessengerStore((s) => s.selectChat)
   const messagesByChatId = useMessengerStore((s) => s.messagesByChatId)
   const users = useMessengerStore((s) => s.users)
+  const chatSearchQuery = useMessengerStore((s) => s.chatSearchQuery)
+  const chatSearchActiveMatchIndex = useMessengerStore(
+    (s) => s.chatSearchActiveMatchIndex,
+  )
+  const compactChatBubble = useMessengerStore((s) => s.compactChatBubble)
 
   if (!activeChatId) {
     return (
@@ -26,6 +33,11 @@ export function ChatPanel({ className, showBack }: ChatPanelProps) {
   }
 
   const messages = messagesByChatId[activeChatId] ?? []
+  const q = chatSearchQuery.trim().toLowerCase()
+  const searchMatchIds =
+    q && messages.length
+      ? messages.filter((m) => m.text.toLowerCase().includes(q)).map((m) => m.id)
+      : []
 
   return (
     <section
@@ -43,8 +55,15 @@ export function ChatPanel({ className, showBack }: ChatPanelProps) {
         chatId={activeChatId}
         messages={messages}
         usersById={users}
+        searchQuery={chatSearchQuery}
+        searchMatchIds={searchMatchIds}
+        searchActiveIndex={chatSearchActiveMatchIndex}
+        compactBubbles={compactChatBubble}
       />
       <SendMessageForm />
+      {chatSettingsChatId === activeChatId ? (
+        <ChatSettingsView key={activeChatId} chatId={activeChatId} />
+      ) : null}
     </section>
   )
 }

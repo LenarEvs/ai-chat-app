@@ -51,6 +51,8 @@ interface MessengerActions {
   setChatSearchQuery: (query: string) => void
   goToNextChatSearchMatch: () => void
   goToPrevChatSearchMatch: () => void
+  /** Личный чат: при существующем direct с тем же peer — только переключение. */
+  openOrCreateDirectChat: (peerUserId: string) => void
 }
 
 function pickResponderId(chat: Chat): string {
@@ -209,6 +211,43 @@ export const useMessengerStore = create<MessengerState & MessengerActions>()(
           (s.chatSearchActiveMatchIndex - 1 + matches.length) % matches.length
         return { chatSearchActiveMatchIndex: next }
       }),
+
+    openOrCreateDirectChat: (peerUserId) => {
+      if (peerUserId === CURRENT_USER_ID) return
+      const state = get()
+      const peer = state.users[peerUserId]
+      if (!peer) return
+
+      const existing = state.chats.find(
+        (c) => c.type === 'direct' && c.peerUserId === peerUserId,
+      )
+      if (existing) {
+        get().selectChat(existing.id)
+        return
+      }
+
+      const id = crypto.randomUUID()
+      const now = Date.now()
+      const chat: Chat = {
+        id,
+        type: 'direct',
+        title: peer.displayName,
+        participantIds: [CURRENT_USER_ID, peerUserId],
+        peerUserId,
+        lastMessageText: '',
+        lastMessageAt: now,
+        unreadCount: 0,
+      }
+
+      set((s) => ({
+        chats: sortChatsList([...s.chats, chat]),
+        messagesByChatId: { ...s.messagesByChatId, [id]: [] },
+        activeChatId: id,
+        chatSearchActiveMatchIndex: 0,
+        chatSearchOpen: false,
+        chatSettingsChatId: null,
+      }))
+    },
 
     sendText: async (draft) => {
       const text = draft.trim()

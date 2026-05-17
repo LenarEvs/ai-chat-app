@@ -7,6 +7,7 @@ import { Search, Settings, User } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { formatChatListTime } from '@/shared/lib/format-time'
 import { useIsNarrowScreen } from '@/shared/lib/use-media-query'
+import { NewChatMenu } from '@/features/new-chat'
 
 function ChatRow({
   chat,
@@ -110,7 +111,8 @@ export function ChatSidebar({ className }: { className?: string }) {
             </button>
           </div>
         ) : null}
-        <div className="mx-auto mb-3 flex items-center gap-2">
+        <div className="mx-auto mb-3 flex min-w-0 items-center gap-2">
+          <NewChatMenu />
           <div className="relative flex min-w-0 flex-1">
             <span className="pointer-events-none absolute left-3 top-1/2 flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center text-slate-400">
               <Search size={18} strokeWidth={1.75} className="shrink-0" />

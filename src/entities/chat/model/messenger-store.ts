@@ -144,6 +144,14 @@ export const useMessengerStore = create<MessengerState & MessengerActions>()(
     clearChatHistory: (chatId) =>
       set((s) => {
         const now = Date.now()
+        const clearSearchForThisChat =
+          s.activeChatId === chatId
+            ? {
+                chatSearchOpen: false,
+                chatSearchQuery: '',
+                chatSearchActiveMatchIndex: 0,
+              }
+            : null
         return {
           messagesByChatId: { ...s.messagesByChatId, [chatId]: [] },
           chats: sortChatsList(
@@ -157,7 +165,7 @@ export const useMessengerStore = create<MessengerState & MessengerActions>()(
                 : c,
             ),
           ),
-          chatSearchActiveMatchIndex: 0,
+          ...(clearSearchForThisChat ?? {}),
         }
       }),
 

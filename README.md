@@ -1,73 +1,89 @@
-# React + TypeScript + Vite
+# ai-chat-app
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Веб-мессенджер в стиле Telegram: список чатов, переписка, настройки чатов и приложения. Данные и «ответы собеседников» имитируются локально (мок), реального API нет — удобно для вёрстки и учебного UI.
 
-Currently, two official plugins are available:
+## Что делает проект
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Показывает боковую колонку с чатами (личные и групповые), поиск по названиям, счётчики непрочитанных.
+- Открывает выбранный чат: лента сообщений, время, статусы доставки (условно), поиск по тексту внутри чата с подсветкой совпадений.
+- Отправляет ваши сообщения и через небольшую задержку добавляет **автоответ** от собеседника или шаблонный ответ от бота «Поддержка Otus» (см. `src/entities/chat/api/mock-backend.ts`).
+- На узких экранах переключение «список чатов ↔ открытый чат» как в мобильном клиенте.
+- Экраны «Профиль» (редактирование отображаемого имени и username у текущего пользователя) и «Настройки» (компактные пузыри, Enter отправляет / перенос строки).
+- Оверлей «Настройки чата»: без звука, переименование группы, очистка истории.
 
-## React Compiler
+Состояние хранится в **Zustand** (`useMessengerStore`); после перезагрузки страницы данные сбрасываются к сиду из `src/entities/chat/model/seed.ts`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Основные пользовательские сценарии
 
-## Expanding the ESLint configuration
+1. **Переписка** — выбрать чат в боковой панели, набрать текст, отправить; дождаться мок-ответа; при открытом другом чате новые входящие в неактивных чатах увеличивают счётчик непрочитанных.
+2. **Поиск по чатам** — поле поиска в списке чатов фильтрует по названию.
+3. **Поиск в переписке** — в шапке чата открыть поиск по тексту сообщений, листать совпадения.
+4. **Настройки чата** — из шапки чата открыть настройки: заглушить, для группы сменить название, очистить историю.
+5. **Профиль** — слева (рейл) или через «Ещё»: открыть профиль, изменить имя и username (только в локальном состоянии).
+6. **Настройки приложения** — компактные пузыри; поведение Enter при отправке.
+7. **Узкий экран** — без бокового рейла; кнопка «назад» из чата к списку.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Технологии
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+| Область        | Стек |
+|----------------|------|
+| Сборка и dev   | [Vite](https://vite.dev/) 8 |
+| UI             | [React](https://react.dev/) 19, [TypeScript](https://www.typescriptlang.org/) 6 |
+| Стили          | [Tailwind CSS](https://tailwindcss.com/) 4 (`@tailwindcss/vite`) |
+| Состояние      | [Zustand](https://docs.pmnd.rs/zustand/getting-started/introduction) 5 |
+| Иконки         | [lucide-react](https://lucide.dev/) |
+| Утилиты классов| `clsx` |
+| Линтинг        | ESLint 10, `typescript-eslint`, плагины React |
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Алиас импортов: `@/` → каталог `src/` (см. `vite.config.ts`).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Как запустить проект
+
+Требования: **Node.js** (рекомендуется актуальная LTS).
+
+```bash
+# установка зависимостей
+npm install
+
+# режим разработки (HMR)
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+После запуска откройте в браузере адрес, который выведет Vite (обычно `http://localhost:5173`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Дополнительные команды:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build   # production-сборка в dist/
+npm run preview # локальный просмотр собранного приложения
+npm run lint    # проверка ESLint
 ```
+
+Если вы пользуетесь Yarn: `yarn` / `yarn dev` (в репозитории есть и `yarn.lock`, и `package-lock.json` — выберите один менеджер пакетов и придерживайтесь его).
+
+## Обзор структуры проекта
+
+Ориентация на **Feature-Sliced Design** (слои сверху вниз — от экрана к переиспользуемому коду):
+
+```
+src/
+  app/              # Корень приложения (App → страница)
+  pages/            # Страницы (MessengerPage — главный экран)
+  widgets/          # Крупные блоки UI: рейл, сайдбар чатов, панель чата, настройки, профиль
+  features/         # Отдельные действия пользователя (например, форма отправки сообщения)
+  entities/         # Доменные сущности: chat, message, user; store, типы, сид, mock API
+  shared/           # Общие утилиты и UI (cn, медиа-запросы, аватар, логотип)
+public/             # Статика (favicon, спрайт иконок)
+index.html          # Точка входа HTML
+vite.config.ts      # Vite, алиас @
+```
+
+Ключевые файлы для понимания логики:
+
+- `src/entities/chat/model/messenger-store.ts` — единое состояние чатов и сообщений, отправка и мок-ответы.
+- `src/entities/chat/api/mock-backend.ts` — задержка и текст автоответов.
+- `src/entities/chat/model/seed.ts` — начальные пользователи, чаты и сообщения.
+
+---
+
+Репозиторий: учебный / демо UI для чата с ИИ-подобным сценарием (бот поддержки в сиде); интеграция с реальным LLM или бэкендом в этом коде не реализована.
